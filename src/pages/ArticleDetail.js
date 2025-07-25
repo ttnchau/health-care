@@ -1,76 +1,87 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Footer from '../components/Footer';
-
-const articles = [
-  {
-    id: 1,
-    title: 'Dinh dưỡng cho sức khỏe tim mạch',
-    content: 'Dinh dưỡng đóng vai trò cực kỳ quan trọng trong việc duy trì sức khỏe tim mạch...',
-    image: 'https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/10/24/co-tim-1729763955568534921178.jpg',
-    date: '24/06/2025',
-  },
-  {
-    id: 2,
-    title: 'Làm sao để ngủ ngon hơn mỗi đêm?',
-    content: 'Giấc ngủ là yếu tố then chốt cho sức khỏe tinh thần và thể chất...',
-    image: 'https://www.findjobs.vn//htdocs/images/news/202002/htdocs-images-NGU.jpg',
-    date: '22/06/2025',
-  },
-  {
-    id: 3,
-    title: 'Thể dục buổi sáng: lợi ích và cách bắt đầu',
-    content: 'Bắt đầu ngày mới với những bài tập nhẹ như đi bộ, yoga hay chạy bộ...',
-    image: 'https://cafefcdn.com/203337114487263232/2024/3/4/photo2024-03-0319-42-24-1709469850910307318592-1709553067620-1709553068102372735353.jpg',
-    date: '20/06/2025',
-  },
-  {
-    id: 4,
-    title: 'Cách quản lý căng thẳng hiệu quả',
-    content: 'Học cách thở sâu, thiền định và xây dựng lối sống tích cực để giảm stress...',
-    image: 'https://cdn.nhathuoclongchau.com.vn/unsafe/800x0/https://cms-prod.s3-sgn09.fptcloud.com/positive_stress_la_gi_cach_quan_ly_cang_thang_hieu_qua_2_f79e39bedd.jpg',
-    date: '18/06/2025',
-  },
-  {
-    id: 5,
-    title: 'Uống đủ nước có thật sự cần thiết?',
-    content: 'Nước đóng vai trò quan trọng trong hầu hết các chức năng cơ thể...',
-    image: 'https://s7ap1.scene7.com/is/image/aiastage/uong-nuoc-nhieu-co-tac-dung-gi?qlt=85&wid=1024&ts=1678456208335&dpr=off',
-    date: '16/06/2025',
-  },
-  {
-    id: 6,
-    title: 'Tác hại của thói quen ngồi lâu',
-    content: 'Ngồi lâu liên tục có thể gây đau lưng, thoái hóa cột sống và béo phì...',
-    image: 'https://cdn.nhathuoclongchau.com.vn/unsafe/800x0/filters:quality(95)/https://cms-prod.s3-sgn09.fptcloud.com/dan_van_phong_da_biet_den_tac_hai_cua_ngoi_qua_lau_o_mot_cho_chua_2_1024x683_5faade8142.jpg',
-    date: '14/06/2025',
-  },
-];
 
 export default function ArticleDetailPage() {
   const { id } = useParams();
-  const article = articles.find((a) => a.id === parseInt(id));
+  const [article, setArticle] = useState(null);
+  const [relatedArticles, setRelatedArticles] = useState([]);
   const [liked, setLiked] = useState(false);
-  const [comments, setComments] = useState([
-    { name: 'Lan', text: 'Hãy để lại bình luận chia sẻ suy nghĩ của bạn về bài viết này. Bạn có thể đặt câu hỏi, góp ý hoặc chia sẻ trải nghiệm của mình. Chúng tôi rất mong nhận được ý kiến từ bạn!' },
-  ]);
+  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState({ name: '', text: '' });
 
-  if (!article) {
-    return <div className="min-h-screen flex items-center justify-center text-gray-500">Không tìm thấy bài viết.</div>;
-  }
+  // Lấy bài viết chi tiết
+  useEffect(() => {
+    const fetchArticle = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/articles/${id}`);
+        const data = await res.json();
+        setArticle(data);
+      } catch (err) {
+        console.error('Lỗi tải bài viết:', err);
+      }
+    };
+    fetchArticle();
+  }, [id]);
 
-  const relatedArticles = articles.filter((a) => a.id !== article.id);
+  // Lấy bài viết gợi ý (ngoài bài hiện tại)
+  useEffect(() => {
+    const fetchRelated = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/articles`);
+        const data = await res.json();
+        const filtered = data.filter((a) => a.id !== parseInt(id));
+        setRelatedArticles(filtered);
+      } catch (err) {
+        console.error('Lỗi tải bài viết gợi ý:', err);
+      }
+    };
+    fetchRelated();
+  }, [id]);
+
+  // Lấy bình luận
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/articles/${id}/comments`);
+        const data = await res.json();
+        setComments(data.map(c => ({ name: c.name, text: c.content })));
+      } catch (err) {
+        console.error('Lỗi tải bình luận:', err);
+      }
+    };
+    fetchComments();
+  }, [id]);
 
   const handleLike = () => setLiked(!liked);
 
-  const handleCommentSubmit = (e) => {
+  const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (newComment.name && newComment.text) {
-      setComments([...comments, newComment]);
-      setNewComment({ name: '', text: '' });
+    if (!newComment.name || !newComment.text) return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/articles/${id}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ content: newComment.text }),
+      });
+
+      if (res.ok) {
+        const newCmt = { name: newComment.name, text: newComment.text };
+        setComments([...comments, newCmt]);
+        setNewComment({ name: '', text: '' });
+      } else {
+        alert('Bạn cần đăng nhập để bình luận.');
+      }
+    } catch (err) {
+      console.error('Lỗi gửi bình luận:', err);
     }
   };
+
+  if (!article) return <div className="min-h-screen flex items-center justify-center text-gray-500">Đang tải bài viết...</div>;
 
   return (
     <div className="bg-gradient-to-br from-teal-50 via-white to-teal-100">

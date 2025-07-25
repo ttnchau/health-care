@@ -1,47 +1,74 @@
-<button onclick="openAuthModal()" class="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700">
-    Đăng nhập / Đăng ký
-</button>
+<!DOCTYPE html>
+<html lang="vi">
 
-<div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-    <div class="bg-white w-[350px] mx-auto mt-28 p-6 rounded-lg relative shadow-lg">
-        <h2 id="authTitle" class="text-2xl font-semibold mb-4">Đăng nhập</h2>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập / Đăng ký</title>
+    <style>
+        body {
+            font-family: Arial;
+            display: flex;
+            justify-content: center;
+            padding-top: 40px;
+        }
 
-        <div id="nameField" class="mb-4 hidden">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Họ tên:</label>
-            <input type="text" id="name"
-                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500" />
+        #auth-container {
+            width: 400px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: teal;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: teal;
+        }
+
+        .toggle {
+            text-align: center;
+            margin-top: 10px;
+            color: teal;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="auth-container">
+        <h2 id="form-title">Đăng nhập</h2>
+        <div id="name-group" style="display: none;">
+            <label>Họ tên:</label>
+            <input type="text" id="name" />
         </div>
+        <label>Email:</label>
+        <input type="email" id="email" />
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
-            <input type="email" id="email"
-                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500" />
-        </div>
+        <label>Mật khẩu:</label>
+        <input type="password" id="password" />
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu:</label>
-            <input type="password" id="password"
-                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500" />
-        </div>
+        <button onclick="handleSubmit()">Xác nhận</button>
 
-        <button onclick="handleAuth()" class="w-full bg-teal-600 text-white py-2 rounded hover:bg-teal-700">
-            Xác nhận
-        </button>
-
-        <p id="switchForm" onclick="toggleAuth()"
-            class="text-sm text-teal-600 mt-3 text-center cursor-pointer hover:underline">
-            Chưa có tài khoản? Đăng ký
-        </p>
-
-        <button onclick="closeAuthModal()" class="absolute top-2 right-2 text-xl text-gray-500 hover:text-red-500">
-            ×
-        </button>
+        <div class="toggle" onclick="toggleMode()">Chưa có tài khoản? Đăng ký</div>
     </div>
-</div>
 
-<p id="welcomeUser" class="mt-4 text-lg text-green-600 font-medium"></p>
-<button onclick="logout()" class="mt-2 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">
-    Đăng xuất
-</button>
+    <script src="auth.js"></script>
+</body>
 
-<script src="auth.js"></script>
+</html>
