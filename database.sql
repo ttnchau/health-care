@@ -29,6 +29,14 @@ CREATE TABLE comments (
   created_at DATETIME DEFAULT GETDATE()
 );
 
+CREATE TABLE ContactMessages (
+  MessageID INT IDENTITY(1,1) PRIMARY KEY,
+  FullName NVARCHAR(100),
+  Email NVARCHAR(100),
+  Content NVARCHAR(MAX),
+  CreatedAt DATETIME DEFAULT GETDATE()
+);
+
 INSERT INTO users (name, email, password)
 VALUES 
   (N'Nguyễn Văn A', 'a@gmail.com', 'hashed_password_a'),
@@ -56,3 +64,4 @@ VALUES
 
 select * from users;
 select * from comments;
+select * from ContactMessages;
